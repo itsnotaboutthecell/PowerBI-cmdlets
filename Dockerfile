@@ -1,17 +1,6 @@
 FROM jupyter/base-notebook:latest
 
-RUN python -m pip install --upgrade pip
-COPY requirements.txt ./requirements.txt
-RUN python -m pip  install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
-
-RUN jupyter labextension install @jupyterlab/toc
-RUN jupyter serverextension enable --py jupyterlab_git
-
-RUN jupyter lab build
-
-#Working Directory
-WORKDIR $HOME
+# Install .NET CLI dependencies
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -60,8 +49,7 @@ RUN dotnet_sdk_version=3.1.301 \
     && dotnet help
 
 # Copy notebooks
-COPY ./config ${HOME}/.jupyter/
-COPY ./ ${HOME}/Notebooks/
+COPY ./samples/notebooks/ ${HOME}/Notebooks/
 
 # Copy package sources
 COPY ./NuGet.config ${HOME}/nuget.config
