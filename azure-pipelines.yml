@@ -19,4 +19,5 @@ steps:
   displayName: 'Run a multi-line script'
 - task: PowerShell@2
   inputs:
-    filePath: '.\Test.ps1'
+    targetType: 'inline'
+    script: 'Write-Host "Blah, Blah Blah"'
