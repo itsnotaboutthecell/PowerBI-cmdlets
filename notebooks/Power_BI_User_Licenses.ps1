@@ -2,7 +2,7 @@ $outPath = "C:\"
 
 #########################################
 
-$modules = "MSOnline"
+$m = "MSOnline"
 
 try {Import-Module $m -ErrorAction Stop} 
 catch {Install-Module -Name $m -Scope CurrentUser -Force} 
