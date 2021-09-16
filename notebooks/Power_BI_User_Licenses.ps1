@@ -13,11 +13,11 @@ Connect-MsolService
 if ($outPath.Substring($outPath.Length - 1, 1) -cne "\") { $outPath = $outPath + "\" }
 if (!(Test-Path $outPath)) { New-Item -ItemType Directory -Force -Path $outPath }
 
-# Official Docs: https://docs.microsoft.com/en-us/power-bi/admin/service-admin-licensing-organization#license-types-and-capabilities
-# Power_BI_Pro = Power BI Pro
-# Power_BI_Standard = Power BI (free)
+# Power BI Licensing Types and Capabilities Official Docs: https://docs.microsoft.com/en-us/power-bi/admin/service-admin-licensing-organization#license-types-and-capabilities
+# For a complete listing of all Licensing Service Plans visit: https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/licensing-service-plan-reference
 
-$licenseType = "Power_BI_Pro", "Power_BI_Standard"
+$licenseType = "POWER_BI_STANDARD","POWER_BI_ADDON","PBI_PREMIUM_P1_ADDON","PBI_PREMIUM_PER_USER","PBI_PREMIUM_PER_USER_ADDON","PBI_PREMIUM_PER_USER_DEPT","POWER_BI_PRO","POWER_BI_PRO_CE","POWER_BI_PRO_DEPT"
+
 
 $allUsers = Get-MsolUser -All | where {$_.isLicensed -eq "True"}
 
