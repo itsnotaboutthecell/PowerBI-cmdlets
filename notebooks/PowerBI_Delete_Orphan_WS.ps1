@@ -1,11 +1,11 @@
 Connect-PowerBIServiceAccount
 
-$ws = Get-PowerBIWorkspace -Scope Organization -Orphaned
+$workSpaces = Get-PowerBIWorkspace -Scope Organization -Orphaned
 
-write-host "Total orphaned workspaces: $($ws.count)`n"
+write-host "Total orphaned workspaces: $($workSpaces.count)`n"
 
-ForEach ($orphan in $ws)
+ForEach ($w in $workSpaces)
 {
-    write-host $orphan.Id
-    Invoke-PowerBIRestMethod -Url 'https://api.powerbi.com/v1.0/myorg/groups/$($orphan.id)' -Method Delete
+    echo $w.Id
+    Invoke-PowerBIRestMethod -Url "https://api.powerbi.com/v1.0/myorg/groups/$($w.id)" -Method Delete
 }
