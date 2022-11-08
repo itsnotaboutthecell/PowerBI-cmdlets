@@ -1,4 +1,4 @@
-$outPath = "C:\"
+$outPath = "C:\temp"
 
 #########################################
 
@@ -19,7 +19,7 @@ if (!(Test-Path $outPath)) { New-Item -ItemType Directory -Force -Path $outPath 
 
 $licenseType = "POWER_BI_STANDARD","POWER_BI_ADDON","PBI_PREMIUM_P1_ADDON","PBI_PREMIUM_PER_USER","PBI_PREMIUM_PER_USER_ADDON","PBI_PREMIUM_PER_USER_DEPT","POWER_BI_PRO","POWER_BI_PRO_CE","POWER_BI_PRO_DEPT"
 
-$allUsers = Get-MsolUser -All | where {$_.isLicensed -eq "True"}
+$allUsers = Get-AzureADUser -All | where {$_.isLicensed -eq "True"}
 
 foreach ($license in $licenseType) {
 
