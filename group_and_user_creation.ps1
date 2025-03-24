@@ -6,7 +6,7 @@ $location = "US" # Geo location
 $license = "a403ebcc-fae0-4ca2-8c8c-7a907fd6c235" # POWER_BI_STANDARD
 
 $PasswordProfile = @{
-    Password                      = "FabCon2025" # Password
+    Password                      = "" # Password
     ForceChangePasswordNextSignIn = $true
 }
 
