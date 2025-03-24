@@ -1,9 +1,19 @@
 # Script variables
-$domain = "test.onmicrosoft.com" # Domain address - ex. example.onmicrosoft.com
-$owners = @('') # Object ID of security group owners
-$experiences = @('') # An array of user group names to be created
-$location = "US" # Geo location
-$license = "a403ebcc-fae0-4ca2-8c8c-7a907fd6c235" # POWER_BI_STANDARD
+
+# Domain address - ex. example.onmicrosoft.com
+$domain = "test.onmicrosoft.com" 
+
+# Object ID of security group owners
+$owners = @('') 
+
+# An array of user groups to be created
+$experiences = @('') 
+
+# Tenant geo location
+$location = "US" 
+
+# POWER_BI_STANDARD license issued - Microsoft Fabric (Free)
+$license = "a403ebcc-fae0-4ca2-8c8c-7a907fd6c235"
 
 $PasswordProfile = @{
     Password                      = "" # Password
@@ -11,7 +21,7 @@ $PasswordProfile = @{
 }
 
 # Function to check and install module if not present
-function Install-ModuleIfNeeded {
+function Ensure-Module {
     param (
         [string]$ModuleName
     )
@@ -21,7 +31,7 @@ function Install-ModuleIfNeeded {
 }
 
 # Function to create a user profile
-function New-UserProfile {
+function Create-UserProfile {
     param (
         [string]$experience,
         [int]$userIndex
@@ -45,7 +55,7 @@ function Add-GroupOwner {
 }
 
 # Function to create a new security group
-function New-SecurityGroup {
+function Create-SecurityGroup {
     param (
         [string]$groupName,
         [string]$mailNickName,
@@ -58,13 +68,12 @@ function New-SecurityGroup {
     if ($existingGroup) {
         Write-Output "'$($groupName)' already exists. No action taken."
         return $existingGroup.Id
-    }
-    else {
+    } else {
         # Create a new security group
         $group = New-MgGroup -DisplayName $groupName `
-            -MailEnabled:$false `
-            -MailNickName $mailNickName `
-            -SecurityEnabled
+                             -MailEnabled:$false `
+                             -MailNickName $mailNickName `
+                             -SecurityEnabled
 
         $groupId = $group.Id
 
@@ -78,7 +87,7 @@ function New-SecurityGroup {
 }
 
 # Function to create users and add them to a group
-function New-UsersAndAddToGroup {
+function Create-UsersAndAddToGroup {
     param (
         [string]$experience,
         [int]$numberOfUsers,
@@ -94,10 +103,10 @@ function New-UsersAndAddToGroup {
 
         # Create the user
         $user = New-MgUser -UserPrincipalName $userProfile.Upn `
-            -PasswordProfile $PasswordProfile `
-            -DisplayName $userProfile.DisplayName `
-            -MailNickName $userProfile.MailNickName `
-            -AccountEnabled:$true -UsageLocation $location
+                            -PasswordProfile $PasswordProfile `
+                            -DisplayName $userProfile.DisplayName `
+                            -MailNickName $userProfile.MailNickName `
+                            -AccountEnabled:$true -UsageLocation $location
 
         Set-MgUserLicense -UserId $user.Id -AddLicenses @{SkuId = $license } -RemoveLicenses @()
 
@@ -123,16 +132,15 @@ foreach ($experience in $experiences) {
     if ($numberOfGroups -eq 1) {
 
         $groupName = "$($experience) Capacity Group"
-        $mailNickName = "$($experience)SecurityGroup"
+        $mailNickName = "$($experience)SecurityGroup0"
 
         # Create a new security group and get its ID
         $groupId = Create-SecurityGroup -groupName $groupName -mailNickName $mailNickName -owners $owners
 
         # Create users and add them to the group
-        New-UsersAndAddToGroup -experience $experience -numberOfUsers $numberOfUsers -groupId $groupId
+        Create-UsersAndAddToGroup -experience $experience -numberOfUsers $numberOfUsers -groupId $groupId
 
-    }
-    else {
+    } else {
 
         $usersPerGroup = [math]::Ceiling($numberOfUsers / $numberOfGroups)
 
@@ -145,10 +153,9 @@ foreach ($experience in $experiences) {
             $groupId = Create-SecurityGroup -groupName $groupName -mailNickName $mailNickName -owners $owners
 
             # Create users and add them to the group with appropriate start index
-            New-UsersAndAddToGroup  -experience $experience `
-                -numberOfUsers ([math]::Min($usersPerGroup, ($numberOfUsers - ($groupCount * $usersPerGroup)))) `
-                -groupId $groupId `
-                -startIndex ($groupCount * $usersPerGroup)
+            Create-UsersAndAddToGroup -experience $experience -numberOfUsers ([math]::Min($usersPerGroup, ($numberOfUsers - ($groupCount * $usersPerGroup)))) `
+                                      -groupId $groupId `
+                                      -startIndex ($groupCount * $usersPerGroup)
         }
     }
 }
